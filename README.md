@@ -81,6 +81,7 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 **1. Briefly describe your method for preventing the adversary from learning information about
 the lengths of the passwords stored in your password manager.**
 To prevent an adversary from deducing password lengths, each password entry in the Keychain is encrypted individually using AES-GCM, with each entry padded or adjusted to a consistent size if necessary (up to a maximum of 64 characters). This design choice prevents any direct correlation between password length and ciphertext length, as the lengths of stored encrypted passwords are uniform regardless of the original password length.
+
 **2. Briefly describe your method for preventing swap attacks (Section 2.2). Provide an argument for why the attack is prevented in your scheme.**
 The Keychain defends against swap attacks by maintaining an integrity check (SHA-256 checksum) of the entire key-value store (KVS) before serialization. When deserializing, the manager verifies that the current state matches the saved checksum. This ensures that any swapped records or alterations to specific domain entries are detected and result in an error. Additionally, using HMAC to hash domain names adds another layer of defense, as it obscures domain identifiers from an attacker.
 
