@@ -91,12 +91,21 @@ No, it is not strictly necessary to assume a trusted location for storing a hash
 **4. Because HMAC is a deterministic MAC (that is, its output is the same if it is run multiple times with the same input), we were able to look up domain names using their HMAC values. There are also randomized MACs, which can output different tags on multiple runs with the same input. Explain how you would do the look up if you had to use a randomized MAC instead of HMAC. Is there a performance penalty involved, and if so, what?**
 Supposing that the randomized MAC is used instead of the HMAC, a whole different mechanism would be needed to resolve the domain names. As a result of randomized MAC and MAC which is different from one computation to the other, consistent looking up cannot be done as only the MAC is stored. Built-in constraints include storing a mapping for the original domain names whose randomized MAC has been verified with a deterministic key. During Lookups, first, Thomson retrieving the domain-name and keys, decrypt them, compute the randomized MAC, and make a match. However, this kind of approach leads to a degradation of performance, because other additional storage and decryption for each lookup are needed. In addition to that, such a MAC for the requested data was randomized that prevents its caching and reusability, which makes the lookups even worse.
 
+**5.  In our specification, we leak the number of records in the password manager. Describe an approach to reduce the information leaked about the number of records.**
+One way to accomplish this is by bucketizing the number of records. Specifically, rather than storing each password entry as an individual item in a key-value store, we can group records into buckets. The size of each bucket doubles as the record count grows, ensuring that the actual number of records is obfuscated and falls within a certain range.
+For example:
+When there are fewer than 8 records, all records are stored in a single bucket.
+For 8 to 15 records, two buckets are used.
+For 16 to 31 records, three buckets are used, and so on.
+The number of buckets grows logarithmically with respect to the number of records. By organizing records in such a way, the system does not expose the exact count, only a range (e.g., between 8 and 15), thus revealing information proportional to log⁡2(𝑘).
+This approach effectively reduces information leakage. If the adversary queries the system for the number of records, they will only be able to deduce a bucket range, not the exact count. This logarithmic leakage aligns with the requirement that the system should not reveal precise details unless two counts 𝑘1 and 𝑘2 ​fall into the same range where log 2(k1)=log 2(k2).
+
 **6. What is a way we can add multi-user support for specific sites to our password manager**
 system without compromising security for other sites that these users may wish to store passwords of? That is, if Alice and Bob wish to access one stored password (say for nytimes) that either of them can get and update, without allowing the other to access their passwords for other websites
 
-1.CREATING SHARED VOLTS.
+1.Creating Shared volts.
 For sites requiring shared access like nytimes create a "shared vault" which is a separate data structure accessible to both users (Alice and Bob).
- Each vault should be associated with access permissions, such as the ability to view or update specific credentials. This vault should be stored and encrypted separately from individual vaults to keep it isolated.
+Each vault should be associated with access permissions, such as the ability to view or update specific credentials. This vault should be stored and encrypted separately from individual vaults to keep it isolated.
 2. Per-User Encryption Keys
 •	Each user will have their own encryption key for their private vault (where they store credentials for non-shared sites).
 •	Shared vaults are encrypted using a shared encryption key, derived through a secure key-exchange mechanism for instance  Diffie-Hellman or using a KDF like PBKDF2 on a shared passphrase if that is an option.
