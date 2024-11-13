@@ -85,5 +85,27 @@ To prevent an adversary from deducing password lengths, each password entry in t
 **2. Briefly describe your method for preventing swap attacks (Section 2.2). Provide an argument for why the attack is prevented in your scheme.**
 The Keychain defends against swap attacks by maintaining an integrity check (SHA-256 checksum) of the entire key-value store (KVS) before serialization. When deserializing, the manager verifies that the current state matches the saved checksum. This ensures that any swapped records or alterations to specific domain entries are detected and result in an error. Additionally, using HMAC to hash domain names adds another layer of defense, as it obscures domain identifiers from an attacker.
 
+**6. What is a way we can add multi-user support for specific sites to our password manager
+system without compromising security for other sites that these users may wish to store
+passwords of? That is, if Alice and Bob wish to access one stored password (say for nytimes)
+that either of them can get and update, without allowing the other to access their passwords
+for other websites
+
+1.CREATING SHARED VOLTS.
+For sites requiring shared access like nytimes create a "shared vault" which is a separate data structure accessible to both users (Alice and Bob).
+ Each vault should be associated with access permissions, such as the ability to view or update specific credentials. This vault should be stored and encrypted separately from individual vaults to keep it isolated.
+2. Per-User Encryption Keys
+•	Each user will have their own encryption key for their private vault (where they store credentials for non-shared sites).
+•	Shared vaults are encrypted using a shared encryption key, derived through a secure key-exchange mechanism for instance  Diffie-Hellman or using a KDF like PBKDF2 on a shared passphrase if that is an option.
+•	When Alice and Bob need access to a shared credential, they decrypt it using the shared key, but they use their private keys for their individual vaults.
+3. Access Control and Permission Management
+•	Assign permissions to each user for each shared vault. For instance, restricting access to view-only for some users while giving full access to others.
+4. Separation of User Sessions and Data
+•	Each user logs in with their credentials, which only grants them access to their private vault and any shared vaults for which they have permissions.
+•	Enforce strict access controls to ensure that a session tied to Alice cannot view or alter Bob’s private vault.
+5. Auditing and Logging
+•	Log access attempts and modifications to shared vaults to track any unauthorized attempts.
+•	This can provide accountability and may alert users if an unauthorized change occurs.
+
 ---
 
