@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Password Manager</h1>
+        <div id="init-section">
+            <input type="password" id="master-password" placeholder="Enter master password">
+            <button onclick="initializeKeychain()">Initialize</button>
+        </div>
+        <div id="main-section" style="display: none;">
+            <h2>Manage Passwords</h2>
+            <div>
+                <input type="text" id="url" placeholder="URL">
+                <input type="password" id="password" placeholder="Password">
+                <button onclick="savePassword()">Save</button>
+            </div>
+            <div>
+                <input type="text" id="lookup-url" placeholder="URL to retrieve">
+                <button onclick="getPassword()">Retrieve</button>
+                <span id="retrieved-password"></span>
+            </div>
+            <div>
+                <input type="text" id="remove-url" placeholder="URL to remove">
+                <button onclick="removePassword()">Remove</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
