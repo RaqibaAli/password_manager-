@@ -12,24 +12,21 @@
         <div id="init-section">
             <input type="password" id="master-password" placeholder="Enter master password">
             <button onclick="initializeKeychain()">Initialize</button>
-            <p id="error-message" style="color: red; display: none;"></p>
+            <p id="password-error" style="color: red; display: none;">Password must be at least 8 characters long, include numbers, uppercase, and special characters.</p>
         </div>
         <div id="main-section" style="display: none;">
             <h2>Manage Passwords</h2>
             <div>
-                <input type="text" id="url" placeholder="URL">
+                <input type="text" id="url" placeholder="Domain/URL">
                 <input type="password" id="password" placeholder="Password">
                 <button onclick="savePassword()">Save</button>
             </div>
             <div>
-                <input type="text" id="lookup-url" placeholder="URL to retrieve">
-                <button onclick="getPassword()">Retrieve</button>
-                <span id="retrieved-password"></span>
+                <input type="text" id="retrieve-url" placeholder="Enter URL to retrieve password">
+                <button onclick="retrievePassword()">Retrieve Password</button>
+                <p id="retrieved-password" style="color: green; display: none;"></p>
             </div>
-            <div id="password-list-container">
-                <h3>Saved Passwords</h3>
-                <ul id="password-list"></ul>
-            </div>
+            <ul id="password-list"></ul>
         </div>
     </div>
     <script src="script.js"></script>

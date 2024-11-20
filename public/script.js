@@ -1,115 +1,76 @@
-// Utility: Check for a strong password
+const passwords = [];
+
 function isStrongPassword(password) {
-    const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#])[A-Za-z\d@$!%?&#]{8,}$/;
     return regex.test(password);
 }
 
-// Initialize keychain with master password
-async function initializeKeychain() {
-    const password = document.getElementById("master-password").value;
-    const errorMessage = document.getElementById("error-message");
+function initializeKeychain() {
+    const masterPassword = document.getElementById('master-password').value;
+    const errorElement = document.getElementById('password-error');
 
-    if (!password) {
-        errorMessage.textContent = "Please enter a master password.";
-        errorMessage.style.display = "block";
+    if (!isStrongPassword(masterPassword)) {
+        errorElement.style.display = 'block';
         return;
     }
+    errorElement.style.display = 'none';
+    document.getElementById('init-section').style.display = 'none';
+    document.getElementById('main-section').style.display = 'block';
+}
 
-    if (!isStrongPassword(password)) {
-        errorMessage.textContent =
-            "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character.";
-        errorMessage.style.display = "block";
-        return;
-    }
+function savePassword() {
+    const url = document.getElementById('url').value;
+    const password = document.getElementById('password').value;
 
-    const response = await fetch("/init", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-    });
-
-    const result = await response.json();
-    if (result.message === "Keychain initialized") {
-        document.getElementById("init-section").style.display = "none";
-        document.getElementById("main-section").style.display = "block";
-        fetchPasswords();
+    if (url && password) {
+        passwords.push({ url, password });
+        renderPasswordList();
+        document.getElementById('url').value = '';
+        document.getElementById('password').value = '';
+    } else {
+        alert('Please fill in both fields!');
     }
 }
 
-// Save a password
-async function savePassword() {
-    const url = document.getElementById("url").value;
-    const password = document.getElementById("password").value;
-
-    const response = await fetch("/set", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, password }),
-    });
-
-    const result = await response.json();
-    alert(result.message);
-    fetchPasswords(); // Refresh the list of saved passwords
+function editPassword(index) {
+    const newPassword = prompt('Enter new password:');
+    if (newPassword) {
+        passwords[index].password = newPassword;
+        renderPasswordList();
+    }
 }
 
-// Retrieve a password by URL
-async function getPassword() {
-    const url = document.getElementById("lookup-url").value;
-
-    const response = await fetch("/get", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-    });
-
-    const result = await response.json();
-    document.getElementById("retrieved-password").textContent = result.password
-        ? `Password: ${result.password}`
-        : "Password not found";
+function deletePassword(index) {
+    passwords.splice(index, 1);
+    renderPasswordList();
 }
 
-// Fetch and display saved passwords
-async function fetchPasswords() {
-    const response = await fetch("/list", { method: "GET" });
-    const result = await response.json();
+function retrievePassword() {
+    const retrieveUrl = document.getElementById('retrieve-url').value;
+    const result = passwords.find(item => item.url === retrieveUrl);
 
-    const passwordList = document.getElementById("password-list");
-    passwordList.innerHTML = "";
+    const retrievedPasswordElement = document.getElementById('retrieved-password');
+    if (result) {
+        retrievedPasswordElement.style.display = 'block';
+        retrievedPasswordElement.textContent = `Password for ${result.url}: ${result.password}`;
+    } else {
+        retrievedPasswordElement.style.display = 'none';
+        alert('Password not found for this domain!');
+    }
+}
 
-    result.forEach((item, index) => {
-        const listItem = document.createElement("li");
+function renderPasswordList() {
+    const passwordList = document.getElementById('password-list');
+    passwordList.innerHTML = '';
+    passwords.forEach((item, index) => {
+        const listItem = document.createElement('li');
         listItem.innerHTML = `
-            <strong>${item.url}</strong>: ${item.password} 
-            <button onclick="editPassword(${index})">Edit</button>
-            <button onclick="deletePassword(${index})">Delete</button>
+            <span>${item.url}: ${item.password}</span>
+            <div class="actions">
+                <button onclick="editPassword(${index})">Edit</button>
+                <button onclick="deletePassword(${index})">Delete</button>
+            </div>
         `;
         passwordList.appendChild(listItem);
     });
-}
-
-// Edit a password
-async function editPassword(index) {
-    const newPassword = prompt("Enter new password:");
-    if (!newPassword) return;
-
-    const response = await fetch(`/edit/${index}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: newPassword }),
-    });
-
-    const result = await response.json();
-    alert(result.message);
-    fetchPasswords();
-}
-
-// Delete a password
-async function deletePassword(index) {
-    const response = await fetch(`/delete/${index}`, {
-        method: "DELETE",
-    });
-
-    const result = await response.json();
-    alert(result.message);
-    fetchPasswords();
 }
