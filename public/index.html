@@ -12,6 +12,7 @@
         <div id="init-section">
             <input type="password" id="master-password" placeholder="Enter master password">
             <button onclick="initializeKeychain()">Initialize</button>
+            <p id="error-message" style="color: red; display: none;"></p>
         </div>
         <div id="main-section" style="display: none;">
             <h2>Manage Passwords</h2>
@@ -25,9 +26,9 @@
                 <button onclick="getPassword()">Retrieve</button>
                 <span id="retrieved-password"></span>
             </div>
-            <div>
-                <input type="text" id="remove-url" placeholder="URL to remove">
-                <button onclick="removePassword()">Remove</button>
+            <div id="password-list-container">
+                <h3>Saved Passwords</h3>
+                <ul id="password-list"></ul>
             </div>
         </div>
     </div>
