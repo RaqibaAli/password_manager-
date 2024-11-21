@@ -1,5 +1,6 @@
 const passwords = [];
 
+let userDatabase = {}; // { username: { salt, representation, checksum } 
 function isStrongPassword(password) {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#])[A-Za-z\d@$!%?&#]{8,}$/;
     return regex.test(password);
@@ -65,7 +66,9 @@ function renderPasswordList() {
     passwords.forEach((item, index) => {
         const listItem = document.createElement('li');
         listItem.innerHTML = `
-            <span>${item.url}: ${item.password}</span>
+            <span>${item.url}:</span>
+            <input type="password" id="password-${index}" value="${item.password}" readonly>
+            <button onclick="togglePasswordVisibility(${index})">👁️</button>
             <div class="actions">
                 <button onclick="editPassword(${index})">Edit</button>
                 <button onclick="deletePassword(${index})">Delete</button>
@@ -73,4 +76,13 @@ function renderPasswordList() {
         `;
         passwordList.appendChild(listItem);
     });
+}
+
+function togglePasswordVisibility(index) {
+    const passwordField = document.getElementById(`password-${index}`);
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+    } else {
+        passwordField.type = 'password';
+    }
 }
