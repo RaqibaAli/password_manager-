@@ -1,4 +1,4 @@
-"use strict";
+ "use strict";
 
 let expect = require('expect.js');
 const { Keychain } = require('../password-manager');
