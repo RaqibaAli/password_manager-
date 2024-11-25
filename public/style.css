@@ -2,7 +2,9 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    background: linear-gradient(135deg, #007BFF, #FF6347, #f4f4f9);
+    background-attachment: fixed;
+    color: #333; /* Adjust text color for better readability on gradient */
 }
 
 .container {
